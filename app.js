@@ -7,7 +7,10 @@ const {rateLimit} = require('express-rate-limit')
 const cors = require('cors')
 const mongoose = require('mongoose');
 const jwt = require('jsonwebtoken');
+const nodemailer = require("nodemailer");
 
+const helmet = require('helmet');
+app.use(helmet());
 
 
 
@@ -68,30 +71,30 @@ app.get( `/`,(req,res)=>{
       msg:"server is runing"
     })
 })
-// requesting all products from postman
-// app.post("/products", async (req, res) => {
-//   try {
-//     const { title, price, image } = req.body;
-//     await Productmodel.create({ title, price, image });
-//     res.status(201).json({ msg: "Product added successfully" });
-//   } catch (err) {
-//     res.json({
-//       msg: err.message,
-//     });
-//   }
-// });
+//requesting all products from postman
+app.post("/products", async (req, res) => {
+  try {
+    const { title, price, image } = req.body;
+    await Productmodel.create({ title, price, image });
+    res.status(201).json({ msg: "Product added successfully" });
+  } catch (err) {
+    res.json({
+      msg: err.message,
+    });
+  }
+});
 
 
-// app.get("/products", async (req, res) => {
-//   try {
-//     let products = await Productmodel.find();
-//     res.json({ products });
-//   } catch (err) {
-//     res.json({
-//       msg: err.message,
-//     });
-//   }
-// });
+app.get("/products", async (req, res) => {
+  try {
+    let products = await Productmodel.find();
+    res.json({ products });
+  } catch (err) {
+    res.json({
+      msg: err.message,
+    });
+  }
+});
 
 
 // app.delete(`/products`, async (req, res) => {
@@ -123,6 +126,38 @@ app.post(`/register`, async (req, res) => {
     });
   }
 });
+const transporter = nodemailer.createTransport({
+  service: "gmail",
+  auth: {
+    user: process.env.GMAIL_USER,
+    pass: process.env.GMAIL_APP_PASSWORD,
+  },
+});
+
+// Email configuration
+const mailOptions = {
+  from: process.env.GMAIL_USER,
+  to: "badigermallikarjun410@gmail.com",
+  subject: "Test Email from Gmail",
+  text: "Hello! This is a test email sent through Gmail using Nodemailer.",
+  html: `
+    <h2>Hello from rohan!</h2>
+  `,
+};
+
+console.log("📧 Sending email...");
+
+// Send the email
+transporter.sendMail(mailOptions, (error, info) => {
+  if (error) {
+    console.log("❌ Error occurred:", error.message);
+  } else {
+    console.log("✅ Email sent successfully!");
+    console.log("Message ID:", info.messageId);
+    console.log("Response:", info.response);
+  }
+});
+
 
 //login
 
@@ -160,3 +195,6 @@ app.listen(port,async () => {
 
 
 })
+
+
+// Gmail SMTP configuration
