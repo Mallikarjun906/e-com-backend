@@ -100,7 +100,7 @@ app.get("/products", async (req, res) => {
 app.delete(`/products`, async (req, res) => {
   try {
     let product = await Productmodel.findByIdAndDelete(req.params.id);
-    res.json({ product });
+    // res.json({ product });
      res.status(200).json({ msg: "Product deleted successfully" });
   } catch (err) {
     res.json({
